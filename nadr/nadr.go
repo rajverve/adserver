@@ -24,7 +24,7 @@ func GetResource() *NADR {
 	case n := <-pool:
 		return n
 	default:
-		log.Println("Requests exceeded max requests")
+		log.Println("Requests for NADRs exceeded max requests")
 		return &NADR {
 			Decision: make(chan bool),
 		}
@@ -42,7 +42,7 @@ func ReturnResource(n *NADR) {
 
 
 func (n *NADR) Decide() {
-	n.Decision <- true
+	n.Decision <- false
 }
 
 func (n *NADR) Bid() {
@@ -50,6 +50,6 @@ func (n *NADR) Bid() {
 }
 
 
-func (n *NADR) Normalize() {
+func normalize(n *NADR) {
 
 }

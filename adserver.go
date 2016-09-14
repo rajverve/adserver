@@ -30,6 +30,8 @@ func processRequest(w http.ResponseWriter, req *http.Request) {
 	if shouldBid := <-n.Decision; shouldBid {
 		n.Bid()
 		fmt.Println("Put in a bid")
+	} else {
+		fmt.Println("Going to sit this one out")
 	}
 
 	nadr.ReturnResource(n)
