@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"log"
-	"github.com/rajverve/adserver/nadr"
+	"github.com/rajverve/adserver/supply"
 )
 
 type HandlerFunc func(w http.ResponseWriter, req *http.Request)
@@ -22,17 +22,17 @@ func (f HandlerFunc) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func processRequest(w http.ResponseWriter, req *http.Request) {
-	n := nadr.GetResource()
-	n.Initialize(w, req)
+	d := supply.GetResource()
+	d.Initialize(w, req)
 
-	go n.Decide()
+	go d.Decide()
 
-	if shouldBid := <-n.Decision; shouldBid {
-		n.Bid()
+	if shouldBid := <-d.Decision; shouldBid {
+		d.Bid()
 		fmt.Println("Put in a bid")
 	}
 
-	nadr.ReturnResource(n)
+	supply.ReturnResource(d)
 }
 
 
