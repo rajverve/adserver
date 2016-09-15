@@ -22,7 +22,7 @@ func (f HandlerFunc) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func processRequest(w http.ResponseWriter, req *http.Request) {
-	d := supply.GetResource()
+	d := supplyPool.GetResource()
 	d.Initialize(w, req)
 
 	go d.Decide()

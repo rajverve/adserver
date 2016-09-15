@@ -16,10 +16,10 @@ func NewNadr(b []byte) *NADR {
 	n := NADR{}
 	err := json.Unmarshal(b, &n)
 
-	if err {
+	if err != nil {
 		fmt.Println("Error unmarshaling json")
 		return &NADR{}
 	}
 
-	return n;
+	return &n;
 }
