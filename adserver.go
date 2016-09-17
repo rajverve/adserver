@@ -9,6 +9,8 @@ import (
 
 type HandlerFunc func(w http.ResponseWriter, req *http.Request)
 
+var pool = supply.NewSupplyPool(10)
+
 func main() {
 	http.Handle("/adserver", http.HandlerFunc(processRequest))
 	err := http.ListenAndServe(":55555", nil)
@@ -22,7 +24,7 @@ func (f HandlerFunc) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func processRequest(w http.ResponseWriter, req *http.Request) {
-	d := supplyPool.GetResource()
+	d := pool.GetResource()
 	d.Initialize(w, req)
 
 	go d.Decide()
@@ -34,7 +36,7 @@ func processRequest(w http.ResponseWriter, req *http.Request) {
 		fmt.Println("Going to sit this one out")
 	}
 
-	supply.ReturnResource(d)
+	pool.ReturnResource(d)
 }
 
 

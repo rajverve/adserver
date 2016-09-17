@@ -20,9 +20,9 @@ func (s *Supply) Initialize(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Supply) Decide() {
-    p := s.readRequest()
-    n := nadr.NewNadr(p)
-    fmt.Println(n)
+    	p := s.readRequest()
+    	n := nadr.NewNadr(p)
+	fmt.Println(n)
 	s.Decision <- true
 }
 
@@ -31,13 +31,13 @@ func (s *Supply) Bid() {
 }
 
 func (s *Supply) readRequest() []byte {
-    p := make([]byte, 256) 
-    _, err := s.req.Body.Read(p) 
+    	p := make([]byte, 256)
+    	read, err := s.req.Body.Read(p)
     
-    if err != io.EOF  && err != nil {
-        fmt.Printf("supply: Error reading request %v\n", err)
-    }
+    	if err != io.EOF  && err != nil {
+        	fmt.Printf("supply: Error reading request %v\n", err)
+    	}
 
-    return p
+    	return p[:read]
 }
 

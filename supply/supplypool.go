@@ -4,27 +4,36 @@ import (
 	"log"
 )
 
-var pool = make(chan *Supply, 10)
+type SupplyPool struct {
+	ch chan *Supply
+}
 
+func NewSupplyPool(size int) *SupplyPool {
+	return &SupplyPool {
+		ch: make(chan *Supply, size),
+	}
+}
 
-func GetResource() *Supply {
+func (pool *SupplyPool) GetResource() *Supply {
 	select {
-	case s := <-pool:
-		return s
+	case r := <-pool.ch:
+		return r
 	default:
-		log.Println("Requests exceeded max requests")
+		log.Println("Creating new supply")
 		return &Supply{
 			Decision: make(chan bool),
 		}
 	}
 }
 
-func ReturnResource(s *Supply) {
+func (pool *SupplyPool) ReturnResource(s *Supply) {
 	select {
-	case pool <- s:
-	// return n to free list
+	case pool.ch <- s:
+		// return n to free list
+		log.Println("Returning Supply to pool")
 	default:
-	// free list full, allow n to be garbage collected
+		// free list full, allow n to be garbage collected
+		log.Println("Allowing excess Supply to be garbage collected")
 	}
 }
 

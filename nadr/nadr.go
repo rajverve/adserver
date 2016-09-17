@@ -6,18 +6,19 @@ import (
 )
 
 type NADR struct {
-	deviceId string
-	lat float64
-	lng float64
+	DeviceId string
+	Lat float64
+	Lng float64
 }
 
 
 func NewNadr(b []byte) *NADR {
+	fmt.Println(string(b))
 	n := NADR{}
 	err := json.Unmarshal(b, &n)
 
 	if err != nil {
-		fmt.Println("Error unmarshaling json")
+		fmt.Println("Error unmarshaling json", err)
 		return &NADR{}
 	}
 
