@@ -22,7 +22,6 @@ func (s *Supply) Initialize(w http.ResponseWriter, req *http.Request) {
 func (s *Supply) Decide() {
     	p := s.readRequest()
     	n := nadr.NewNadr(p)
-	fmt.Println(n)
 	s.Decision <- true
 }
 

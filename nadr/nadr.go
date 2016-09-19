@@ -13,7 +13,6 @@ type NADR struct {
 
 
 func NewNadr(b []byte) *NADR {
-	fmt.Println(string(b))
 	n := NADR{}
 	err := json.Unmarshal(b, &n)
 
