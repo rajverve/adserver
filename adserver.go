@@ -2,31 +2,43 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"log"
 	"github.com/rajverve/adserver/supply"
 	"google.golang.org/grpc"
-	pb "github.com/rajverve/protobuf"
+	"log"
+	"net/http"
 )
 
 type HandlerFunc func(w http.ResponseWriter, req *http.Request)
 
-var pool = supply.NewSupplyPool(10)
+var pool *supply.SupplyPool
+var listenPort = ":55555"
+var vlsPort = ":4444"
+var blacklistPort = ":3333"
 
 func main() {
+
+	vlsConn, err := grpc.Dial(vlsPort, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect to vls server: %v", err)
+		return
+	}
+	defer vlsConn.Close()
+
+	blacklistConn, err := grpc.Dial(blacklistPort, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect to blacklist server: %v", err)
+		return
+	}
+	defer blacklistConn.Close()
+
+	pool = supply.NewSupplyPool(10, vlsConn, blacklistConn)
+
 	http.Handle("/adserver", http.HandlerFunc(processRequest))
-	err := http.ListenAndServe(":55555", nil)
+	err = http.ListenAndServe(listenPort, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
+		return
 	}
-
-	conn, err := grpc.Dial("4444", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
-	c := pb.NewSegmentationClient(conn)
-
 }
 
 func (f HandlerFunc) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -34,8 +46,7 @@ func (f HandlerFunc) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func processRequest(w http.ResponseWriter, req *http.Request) {
-	d := pool.GetResource()
-	d.Initialize(w, req)
+	d := pool.GetResource(w, req)
 
 	go d.Decide()
 
@@ -48,6 +59,3 @@ func processRequest(w http.ResponseWriter, req *http.Request) {
 
 	pool.ReturnResource(d)
 }
-
-
-
