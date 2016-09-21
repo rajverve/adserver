@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net/http"
+	"github.com/rajverve/adserver/admatcher"
 )
 
 type HandlerFunc func(w http.ResponseWriter, req *http.Request)
@@ -16,6 +17,8 @@ var vlsPort = ":4444"
 var blacklistPort = ":3333"
 
 func main() {
+
+	admatcher.SeedAdMatcher() // for testing only
 
 	vlsConn, err := grpc.Dial(vlsPort, grpc.WithInsecure())
 	if err != nil {
